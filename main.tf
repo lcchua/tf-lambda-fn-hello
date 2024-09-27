@@ -12,6 +12,8 @@ provider "aws" {
 # instead of Terraform resource. The only difference is that the permissions 
 # are slightly different, and the archive is created using a null resource 
 # with a local-exec provisioner that runs a Python script.
+# If uncomment this block below to use Terraform module instead, then just
+# comment out the remaining lines of codes from line 30 inwards.
 /*
 module "lambda" {
  source        = "terraform-aws-modules/lambda/aws"
