@@ -3,3 +3,10 @@ def lambda_handler(event, context):
    return {
        'message' : message
    }
+
+# Alternative Python pgm code for test, uncomment as needed
+""" def lambda_handler(event, context):
+   return {
+       'statusCode': 200,
+       'body': 'Hello, World!'
+   } """
