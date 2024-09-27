@@ -34,7 +34,7 @@ module "lambda" {
 */
 
 resource "aws_iam_role" "lambdafn_iam_role" {
-    name   = "lcchua-stw-lambdafn-role-${random_string.unique_suffix}"
+    name   = "lcchua-stw-lambdafn-role-${random_string.unique_suffix.result}"
     assume_role_policy = <<EOF
     {
       "Version": "2012-10-17",
@@ -53,7 +53,7 @@ resource "aws_iam_role" "lambdafn_iam_role" {
 }
 
 resource "aws_iam_policy" "lambdafn_iam_policy" {
-    name         = "lcchua-stw-lambdafn-policy-${random_string.unique_suffix}"
+    name         = "lcchua-stw-lambdafn-policy-${random_string.unique_suffix.result}"
     path         = "/"
     description  = "AWS IAM Policy for managing aws lambda role"
     policy = <<EOF
@@ -96,6 +96,6 @@ resource "aws_lambda_function" "tf_lambda_func" {
 }
 
 resource "aws_cloudwatch_log_group" "lambda_log_group" {
-    name              = "/aws/lambda/lcchua-hello-${random_string.unique_suffix}"
+    name              = "/aws/lambda/lcchua-hello-${random_string.unique_suffix.result}"
     retention_in_days = 14
 }
