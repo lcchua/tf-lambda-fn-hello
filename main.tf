@@ -31,8 +31,13 @@ module "lambda" {
 }
 */
 
+data "aws_iam_role" "existing_iam_role" {
+    name = "lcchua-stw-lambdafn-role"
+}
 resource "aws_iam_role" "lambdafn_iam_role" {
-    name   = "lcchua-stw-lambdafn-role"
+    count  = var.create_iam_role ? 1 : 0
+
+    name   = data.aws_iam_role.existing_iam_role.name
     assume_role_policy = <<EOF
     {
       "Version": "2012-10-17",
@@ -50,8 +55,13 @@ resource "aws_iam_role" "lambdafn_iam_role" {
     EOF
 }
 
+data "aws_iam_role" "existing_iam_policy" {
+    name = "lcchua-stw-lambdafn-policy"
+}
 resource "aws_iam_policy" "lambdafn_iam_policy" {
-    name         = "lcchua-stw-lambdafn-iam-policy"
+    count  = var.create_iam_policy ? 1 : 0
+
+    name         = data.aws_iam_role.existing_iam_policy.name
     path         = "/"
     description  = "AWS IAM Policy for managing aws lambda role"
     policy = <<EOF
@@ -93,7 +103,12 @@ resource "aws_lambda_function" "tf_lambda_func" {
     depends_on       = [aws_iam_role_policy_attachment.attach_iam_policy_to_iam_role]
 }
 
+data "aws_cloudwatch_log_group" "existing_log_group" {
+    name = "/aws/lambda/hello_world_lambda"
+}
 resource "aws_cloudwatch_log_group" "lambda_log_group" {
- name              = "/aws/lambda/hello_world_lambda"
- retention_in_days = 14
+    count              = var.create_log_group ? 1 : 0
+
+    name              = data.aws_cloudwatch_log_group.existing_log_group.name
+    retention_in_days = 14
 }
