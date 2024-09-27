@@ -83,8 +83,8 @@ resource "aws_iam_policy" "lambdafn_iam_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "attach_iam_policy_to_iam_role" {
-    role        = aws_iam_role.lambdafn_iam_role.name
-    policy_arn  = aws_iam_policy.lambdafn_iam_policy.arn
+    role        = data.aws_iam_role.existing_iam_role.name
+    policy_arn  = data.aws_iam_role.existing_iam_policy.arn
 }
 
 data "archive_file" "zip_the_python_code" {
