@@ -1,5 +1,5 @@
 # Example A: Deplpoyong serverless applications with AWS Lambda with Terraform 
-# resource or module.
+# resource or module. This is the current.
 #     https://spacelift.io/blog/terraform-aws-lambda 
 # Example B: Deploying serverless applications with AWS Lambda and API Gateway.
 # This uses S3 for archive storage of the Lambda appl program instead of Zip. 
