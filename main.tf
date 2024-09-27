@@ -91,9 +91,8 @@ resource "aws_iam_policy" "lambdafn_iam_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "attach_iam_policy_to_iam_role" {
-
-    role        = try(aws_iam_role.lambdafn_iam_role[0].name, 0)
-    policy_arn  = try(aws_iam_policy.lambdafn_iam_policy[0].arn, 0)
+    role        = try(aws_iam_role.lambdafn_iam_role[0].name, "")
+    policy_arn  = try(aws_iam_policy.lambdafn_iam_policy[0].arn, "")
 }
 
 data "archive_file" "zip_the_python_code" {
@@ -122,6 +121,6 @@ locals {
 resource "aws_cloudwatch_log_group" "lambda_log_group" {
     count              = local.create_log_group ? 1 : 0
 
-    name              = "/aws/lambda/hello_world_lambda"
+    name              = "/aws/lambda/lcchua-hello"
     retention_in_days = 14
 }
