@@ -36,13 +36,10 @@ data "aws_iam_role" "existing_iam_role" {
 }
 locals {
   iam_role_exists = try(length(data.aws_iam_role.existing_iam_role.id) > 0, false)
-}
-variable "create_iam_role" {
-  type    = bool
-  default = !local.iam_role_exists # To create if does not exists
+  create_iam_role = !local.iam_role_exists # To create if does not exists
 }
 resource "aws_iam_role" "lambdafn_iam_role" {
-    count  = var.create_iam_role ? 1 : 0
+    count  = local.create_iam_role ? 1 : 0
 
     name   = "lcchua-stw-lambdafn-role"
     assume_role_policy = <<EOF
@@ -67,13 +64,10 @@ data "aws_iam_policy" "existing_iam_policy" {
 }
 locals {
   log_policy_exists = try(length(data.aws_iam_policy.existing_iam_policy.id) > 0, false)
-}
-variable "create_iam_policy" {
-  type    = bool
-  default = !local.log_policy_exists # To create if does not exists
+  create_iam_policy = !local.log_policy_exists # To create if does not exists
 }
 resource "aws_iam_policy" "lambdafn_iam_policy" {
-    count  = var.create_iam_policy ? 1 : 0
+    count  = local.create_iam_policy ? 1 : 0
 
     name         = "lcchua-stw-lambdafn-policy"
     path         = "/"
@@ -122,14 +116,11 @@ data "aws_cloudwatch_log_group" "existing_log_group" {
     name = "/aws/lambda/hello_world_lambda"
 }
 locals {
-  log_group_exists_exists = try(length(data.aws_cloudwatch_log_group.existing_log_group.id) > 0, false)
-}
-variable "create_log_group" {
-  type    = bool
-  default = !local.log_group_exists # To create if does not exists
+  log_group_exists = try(length(data.aws_cloudwatch_log_group.existing_log_group.id) > 0, false)
+  create_log_group = !local.log_group_exists # To create if does not exists
 }
 resource "aws_cloudwatch_log_group" "lambda_log_group" {
-    count              = var.create_log_group ? 1 : 0
+    count              = local.create_log_group ? 1 : 0
 
     name              = "/aws/lambda/hello_world_lambda"
     retention_in_days = 14
