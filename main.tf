@@ -76,7 +76,8 @@ resource "aws_iam_policy" "lambdafn_iam_policy" {
 
 resource "aws_iam_role_policy_attachment" "attach_iam_policy_to_iam_role" {
     role        = aws_iam_role.lambdafn_iam_role.name
-    policy_arn  = aws_iam_policy.lambdafn_iam_policy.arn
+    #policy_arn  = aws_iam_policy.lambdafn_iam_policy.arn
+    policy_arn  = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
 data "archive_file" "zip_the_python_code" {
