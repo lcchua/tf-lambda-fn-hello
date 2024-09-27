@@ -8,8 +8,10 @@
 # This current default combines the examples A & B by creating an AWS API Gateway
 # and linking it to the "hello" Lambda function program via a HTTP API call.
 # Refer api_gateway.tf.
-provider "aws" {
-    region = "us-east-1"
+
+resource "random_string" "unique_suffix" {
+  length  = 6
+  special = false
 }
 
 # Uncomment this block if we are to use AWS Lambda Terraform module 
@@ -31,17 +33,8 @@ module "lambda" {
 }
 */
 
-data "aws_iam_role" "existing_iam_role" {
-    name = "lcchua-stw-lambdafn-role"
-}
-locals {
-  iam_role_exists = try(length(data.aws_iam_role.existing_iam_role.id) > 0, false)
-  create_iam_role = !local.iam_role_exists # To create if does not exists
-}
 resource "aws_iam_role" "lambdafn_iam_role" {
-    count  = local.create_iam_role ? 1 : 0
-
-    name   = "lcchua-stw-lambdafn-role"
+    name   = "lcchua-stw-lambdafn-role-${random_string.unique_suffix}"
     assume_role_policy = <<EOF
     {
       "Version": "2012-10-17",
@@ -59,17 +52,8 @@ resource "aws_iam_role" "lambdafn_iam_role" {
     EOF
 }
 
-data "aws_iam_policy" "existing_iam_policy" {
-    name = "lcchua-stw-lambdafn-policy"
-}
-locals {
-  log_policy_exists = try(length(data.aws_iam_policy.existing_iam_policy.id) > 0, false)
-  create_iam_policy = !local.log_policy_exists # To create if does not exists
-}
 resource "aws_iam_policy" "lambdafn_iam_policy" {
-    count  = local.create_iam_policy ? 1 : 0
-
-    name         = "lcchua-stw-lambdafn-policy"
+    name         = "lcchua-stw-lambdafn-policy-${random_string.unique_suffix}"
     path         = "/"
     description  = "AWS IAM Policy for managing aws lambda role"
     policy = <<EOF
@@ -91,8 +75,8 @@ resource "aws_iam_policy" "lambdafn_iam_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "attach_iam_policy_to_iam_role" {
-    role        = try(aws_iam_role.lambdafn_iam_role[0].name, "")
-    policy_arn  = try(aws_iam_policy.lambdafn_iam_policy[0].arn, "")
+    role        = aws_iam_role.lambdafn_iam_role[0].name
+    policy_arn  = aws_iam_policy.lambdafn_iam_policy[0].arn
 }
 
 data "archive_file" "zip_the_python_code" {
@@ -111,16 +95,7 @@ resource "aws_lambda_function" "tf_lambda_func" {
     depends_on       = [aws_iam_role_policy_attachment.attach_iam_policy_to_iam_role]
 }
 
-data "aws_cloudwatch_log_group" "existing_log_group" {
-    name = "/aws/lambda/hello_world_lambda"
-}
-locals {
-  log_group_exists = try(length(data.aws_cloudwatch_log_group.existing_log_group.id) > 0, false)
-  create_log_group = !local.log_group_exists # To create if does not exists
-}
 resource "aws_cloudwatch_log_group" "lambda_log_group" {
-    count              = local.create_log_group ? 1 : 0
-
-    name              = "/aws/lambda/lcchua-hello"
+    name              = "/aws/lambda/lcchua-hello-${random_string.unique_suffix}"
     retention_in_days = 14
 }
