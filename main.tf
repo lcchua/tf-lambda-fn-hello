@@ -2,8 +2,12 @@
 # resource or module. The current default uses Terrafrom resource.
 #     https://spacelift.io/blog/terraform-aws-lambda 
 # Example B: Deploying serverless applications with AWS Lambda and API Gateway.
-# This uses S3 for archive storage of the Lambda appl program instead of Zip. 
+# This uses S3 for archive storage of the zipped Lambda appl program instead of 
+# just storing in a local directory which is less safe.
 #     https://developer.hashicorp.com/terraform/tutorials/aws/lambda-api-gateway 
+# This current default combines the examples A & B by creating an AWS API Gateway
+# and linking it to the "hello" Lambda function program via a HTTP API call.
+# Refer api_gateway.tf.
 provider "aws" {
     region = "us-east-1"
 }
@@ -79,13 +83,14 @@ data "archive_file" "zip_the_python_code" {
     output_path = "${path.module}/python/hello-python.zip"
 }
 
-resource "aws_lambda_function" "terraform_lambda_func" {
-    filename        = "${path.module}/python/hello-python.zip"
-    function_name   = "lcchua-stw-lambda-fn-hello"
-    role            = aws_iam_role.lambdafn_iam_role.arn
-    handler         = "index.lambda_handler"
-    runtime         = "python3.12"
-    depends_on      = [aws_iam_role_policy_attachment.attach_iam_policy_to_iam_role]
+resource "aws_lambda_function" "tf_lambda_func" {
+    filename         = "${path.module}/python/hello-python.zip"
+    function_name    = "lcchua-stw-lambda-fn-hello"
+    role             = aws_iam_role.lambdafn_iam_role.arn
+    handler          = "index.lambda_handler"
+    runtime          = "python3.12"
+    source_code_hash = data.archive_file.zip_the_python_code.output_base64sha256
+    depends_on       = [aws_iam_role_policy_attachment.attach_iam_policy_to_iam_role]
 }
 
 resource "aws_cloudwatch_log_group" "lambda_log_group" {
