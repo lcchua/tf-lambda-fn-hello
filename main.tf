@@ -34,10 +34,17 @@ module "lambda" {
 data "aws_iam_role" "existing_iam_role" {
     name = "lcchua-stw-lambdafn-role"
 }
+locals {
+  iam_role_exists = try(length(data.aws_iam_role.existing_iam_role.id) > 0, false)
+}
+variable "create_iam_role" {
+  type    = bool
+  default = !local.iam_role_exists # To create if does not exists
+}
 resource "aws_iam_role" "lambdafn_iam_role" {
     count  = var.create_iam_role ? 1 : 0
 
-    name   = data.aws_iam_role.existing_iam_role.name
+    name   = "lcchua-stw-lambdafn-role"
     assume_role_policy = <<EOF
     {
       "Version": "2012-10-17",
@@ -55,13 +62,20 @@ resource "aws_iam_role" "lambdafn_iam_role" {
     EOF
 }
 
-data "aws_iam_role" "existing_iam_policy" {
+data "aws_iam_policy" "existing_iam_policy" {
     name = "lcchua-stw-lambdafn-policy"
+}
+locals {
+  log_policy_exists = try(length(data.aws_iam_policy.existing_iam_policy.id) > 0, false)
+}
+variable "create_iam_policy" {
+  type    = bool
+  default = !local.log_policy_exists # To create if does not exists
 }
 resource "aws_iam_policy" "lambdafn_iam_policy" {
     count  = var.create_iam_policy ? 1 : 0
 
-    name         = data.aws_iam_role.existing_iam_policy.name
+    name         = "lcchua-stw-lambdafn-policy"
     path         = "/"
     description  = "AWS IAM Policy for managing aws lambda role"
     policy = <<EOF
@@ -83,8 +97,9 @@ resource "aws_iam_policy" "lambdafn_iam_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "attach_iam_policy_to_iam_role" {
-    role        = data.aws_iam_role.existing_iam_role.name
-    policy_arn  = data.aws_iam_role.existing_iam_policy.arn
+
+    role        = try(aws_iam_role.lambdafn_iam_role[0].name, 0)
+    policy_arn  = try(aws_iam_policy.lambdafn_iam_policy[0].arn, 0)
 }
 
 data "archive_file" "zip_the_python_code" {
@@ -106,9 +121,16 @@ resource "aws_lambda_function" "tf_lambda_func" {
 data "aws_cloudwatch_log_group" "existing_log_group" {
     name = "/aws/lambda/hello_world_lambda"
 }
+locals {
+  log_group_exists_exists = try(length(data.aws_cloudwatch_log_group.existing_log_group.id) > 0, false)
+}
+variable "create_log_group" {
+  type    = bool
+  default = !local.log_group_exists # To create if does not exists
+}
 resource "aws_cloudwatch_log_group" "lambda_log_group" {
     count              = var.create_log_group ? 1 : 0
 
-    name              = data.aws_cloudwatch_log_group.existing_log_group.name
+    name              = "/aws/lambda/hello_world_lambda"
     retention_in_days = 14
 }
