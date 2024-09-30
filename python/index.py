@@ -5,6 +5,7 @@ def lambda_handler(event, context):
        'message' : message
    }
 
+
 # Example 1: Alternative Python pgm code for test, uncomment as needed
 """ def lambda_handler(event, context):
    return {
@@ -12,7 +13,7 @@ def lambda_handler(event, context):
        'body': 'Hello, World!'
    } """
 
-# Example 1: Alternative Python pgm code for test, uncomment as needed
+# Example 2: Alternative Python pgm code for test, uncomment as needed
 """ 
 from flask import Flask
 

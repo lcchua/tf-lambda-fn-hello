@@ -1,12 +1,12 @@
 resource "aws_apigatewayv2_api" "lambda" {
-  name          = "serverless_lambda_gw"
+  name          = "lcchua_hello_lambda_gw"
   protocol_type = "HTTP"
 }
 
 resource "aws_apigatewayv2_stage" "lambda" {
   api_id = aws_apigatewayv2_api.lambda.id
 
-  name        = "serverless_lambda_stage"
+  name        = "lcchua_hello_lambda_stage"
   auto_deploy = true
 
   access_log_settings {
