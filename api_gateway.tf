@@ -1,5 +1,5 @@
 resource "aws_apigatewayv2_api" "lambda" {
-  name          = "lcchua_hello_lambda_gw"
+  name          = "lcchua_hello_lambda_api"
   protocol_type = "HTTP"
 }
 
