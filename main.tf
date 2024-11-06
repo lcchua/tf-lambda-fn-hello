@@ -34,8 +34,8 @@ module "lambda" {
 */
 
 resource "aws_iam_role" "lambdafn_iam_role" {
-    name   = "lcchua-stw-lambdafn-role-${random_string.unique_suffix.result}"
-    assume_role_policy = <<EOF
+  name               = "lcchua-stw-lambdafn-role-${random_string.unique_suffix.result}"
+  assume_role_policy = <<EOF
     {
       "Version": "2012-10-17",
       "Statement": [
@@ -53,10 +53,10 @@ resource "aws_iam_role" "lambdafn_iam_role" {
 }
 
 resource "aws_iam_policy" "lambdafn_iam_policy" {
-    name         = "lcchua-stw-lambdafn-policy-${random_string.unique_suffix.result}"
-    path         = "/"
-    description  = "AWS IAM Policy for managing aws lambda role"
-    policy = <<EOF
+  name        = "lcchua-stw-lambdafn-policy-${random_string.unique_suffix.result}"
+  path        = "/"
+  description = "AWS IAM Policy for managing aws lambda role"
+  policy      = <<EOF
     {
       "Version": "2012-10-17",
       "Statement": [
@@ -75,28 +75,28 @@ resource "aws_iam_policy" "lambdafn_iam_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "attach_iam_policy_to_iam_role" {
-    role        = aws_iam_role.lambdafn_iam_role.name
-    #policy_arn  = aws_iam_policy.lambdafn_iam_policy.arn
-    policy_arn  = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+  role = aws_iam_role.lambdafn_iam_role.name
+  #policy_arn  = aws_iam_policy.lambdafn_iam_policy.arn
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
 data "archive_file" "zip_the_python_code" {
-    type        = "zip"
-    source_dir  = "${path.module}/python/"
-    output_path = "${path.module}/python/hello-python.zip"
+  type        = "zip"
+  source_dir  = "${path.module}/python/"
+  output_path = "${path.module}/python/hello-python.zip"
 }
 
 resource "aws_lambda_function" "tf_lambda_func" {
-    filename         = "${path.module}/python/hello-python.zip"
-    function_name    = "lcchua-stw-lambda-fn-hello"
-    role             = aws_iam_role.lambdafn_iam_role.arn
-    handler          = "index.lambda_handler"
-    runtime          = "python3.12"
-    source_code_hash = data.archive_file.zip_the_python_code.output_base64sha256
-    depends_on       = [aws_iam_role_policy_attachment.attach_iam_policy_to_iam_role]
+  filename         = "${path.module}/python/hello-python.zip"
+  function_name    = "lcchua-stw-lambda-fn-hello"
+  role             = aws_iam_role.lambdafn_iam_role.arn
+  handler          = "index.lambda_handler"
+  runtime          = "python3.12"
+  source_code_hash = data.archive_file.zip_the_python_code.output_base64sha256
+  depends_on       = [aws_iam_role_policy_attachment.attach_iam_policy_to_iam_role]
 }
 
 resource "aws_cloudwatch_log_group" "lambda_log_group" {
-    name              = "/aws/lambda/lcchua-hello-${random_string.unique_suffix.result}"
-    retention_in_days = 14
+  name              = "/aws/lambda/lcchua-hello-${random_string.unique_suffix.result}"
+  retention_in_days = 14
 }
