@@ -7,7 +7,7 @@ on:
       - main
 
 jobs:
-  Terraform:
+  Terraform-CD:
     name: Terraform
     runs-on: ubuntu-latest
 #    defaults:
